@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test de Inteligencia Cognitiva</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f0;color:#1a1a18;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem}
+.container{width:100%;max-width:640px}
+.card{background:#fff;border-radius:16px;padding:2rem;box-shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);margin-bottom:1rem}
+.screen{display:none}.screen.active{display:block}
+.prog-bar{height:5px;background:#e8e6df;border-radius:3px;margin-bottom:1.5rem}
+.prog-fill{height:100%;background:#1a6bcc;border-radius:3px;transition:width .4s ease}
+h1{font-size:24px;font-weight:600;color:#1a1a18;margin-bottom:.5rem}
+h2{font-size:15px;font-weight:600;color:#1a1a18;margin:1.25rem 0 .6rem}
+p{font-size:14px;color:#5a5a56;line-height:1.7}
+.meta-row{display:flex;justify-content:space-between;font-size:13px;color:#888;margin-bottom:.75rem}
+.cat-pill{display:inline-block;font-size:12px;padding:3px 12px;border-radius:6px;font-weight:500;margin-bottom:.75rem}
+.cat-text{background:#e8f0fb;color:#1a6bcc}
+.cat-vis{background:#f0fdf4;color:#15803d}
+.q-text{font-size:16px;font-weight:500;color:#1a1a18;margin-bottom:1rem;line-height:1.6;white-space:pre-line}
+.qsvg-box{border:1px solid #e8e6df;border-radius:10px;padding:1rem;margin-bottom:1rem;background:#fafaf8;text-align:center;overflow:hidden}
+.qsvg-box svg{max-width:100%;height:auto}
+.opt{text-align:left;padding:12px 16px;border:1.5px solid #e0ddd6;border-radius:10px;background:#fff;color:#1a1a18;cursor:pointer;font-size:14px;transition:all .15s;line-height:1.4;font-family:inherit;width:100%;display:block;margin-bottom:9px}
+.opt:last-child{margin-bottom:0}
+.opt:not(:disabled):hover{border-color:#1a6bcc;background:#f0f5fd;color:#1a6bcc}
+.opt.ok{border-color:#15803d!important;background:#f0fdf4!important;color:#15803d!important;font-weight:500}
+.opt.bad{border-color:#dc2626!important;background:#fef2f2!important;color:#dc2626!important}
+.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt-card{border:1.5px solid #e0ddd6;border-radius:10px;background:#fff;cursor:pointer;padding:10px 8px 6px;transition:all .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90px;font-family:inherit}
+.opt-card:not(:disabled):hover{border-color:#1a6bcc;background:#f0f5fd}
+.opt-card.ok{border-color:#15803d!important;background:#f0fdf4!important}
+.opt-card.bad{border-color:#dc2626!important;background:#fef2f2!important}
+.opt-card svg{max-width:100%;height:auto;pointer-events:none}
+.opt-label{font-size:11px;color:#888;margin-top:4px;font-weight:500}
+.btn{display:block;width:100%;padding:13px 20px;border:1.5px solid #1a1a18;border-radius:10px;background:#1a1a18;color:#fff;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;margin-top:1rem;text-align:center}
+.btn:hover:not(:disabled){background:#333;border-color:#333}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-outline{background:#fff;color:#1a1a18}.btn-outline:hover:not(:disabled){background:#f5f5f0}
+.btn-sm{font-size:13px;padding:8px 16px;margin-top:.75rem}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:1.25rem 0}
+.stat-card{background:#f5f5f0;border-radius:10px;padding:.875rem 1rem}
+.stat-lbl{font-size:12px;color:#888;margin-bottom:3px}
+.stat-val{font-size:22px;font-weight:600;color:#1a1a18}
+.area-list{display:flex;flex-wrap:wrap;gap:7px;margin:.75rem 0 1.25rem}
+.area-chip{font-size:13px;padding:4px 12px;border-radius:6px;background:#f5f5f0;color:#5a5a56}
+/* Name input */
+.name-wrap{margin:1.25rem 0 .5rem}
+.name-label{font-size:13px;font-weight:500;color:#5a5a56;margin-bottom:6px;display:block}
+.name-input{width:100%;padding:12px 14px;border:1.5px solid #e0ddd6;border-radius:10px;font-size:15px;font-family:inherit;color:#1a1a18;background:#fff;transition:border-color .15s;outline:none}
+.name-input:focus{border-color:#1a6bcc}
+.name-input::placeholder{color:#bbb}
+/* Spinner */
+.spin-wrap{text-align:center;padding:3rem 0}
+.spin{width:40px;height:40px;border:3px solid #e0ddd6;border-top-color:#1a6bcc;border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 1.25rem}
+@keyframes sp{to{transform:rotate(360deg)}}
+.load-msg{font-size:15px;color:#5a5a56}
+/* Results */
+.iq-hero{text-align:center;padding-bottom:1.5rem;border-bottom:1px solid #e8e6df;margin-bottom:1.25rem}
+.iq-number{font-size:84px;font-weight:700;line-height:1;margin-bottom:6px}
+.iq-label{font-size:14px;color:#888;margin-bottom:8px}
+.iq-badge{display:inline-block;padding:4px 16px;border-radius:6px;background:#e8f0fb;color:#1a6bcc;font-size:13px;font-weight:500}
+.bar-wrap{margin-bottom:12px}
+.bar-meta{display:flex;justify-content:space-between;font-size:13px;color:#5a5a56;margin-bottom:4px}
+.bar-track{height:8px;background:#e8e6df;border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px}
+.item-row{display:flex;align-items:flex-start;gap:8px;font-size:14px;color:#5a5a56;padding:7px 0;border-bottom:1px solid #f0ede6;line-height:1.5}
+.tag-row{display:flex;flex-wrap:wrap;gap:7px}
+.tag{background:#f3f0fc;color:#534AB7;font-size:13px;padding:5px 12px;border-radius:6px;font-weight:500}
+.hi-blue{background:#e8f0fb;border-radius:12px;padding:1rem 1.25rem;margin:1rem 0}
+.hi-blue .hit{font-size:12px;font-weight:600;color:#1a6bcc;margin-bottom:5px}
+.hi-blue p{color:#3a5a80}
+.hi-gray{background:#f5f5f0;border-radius:12px;padding:1rem 1.25rem;margin:1rem 0}
+.hi-gray .hit{font-size:12px;font-weight:600;color:#888;margin-bottom:5px}
+.hi-green{background:#f0fdf4;border-radius:12px;padding:1rem 1.25rem;margin:1rem 0;border:1px solid #bbf7d0}
+.hi-green .hit{font-size:12px;font-weight:600;color:#15803d;margin-bottom:5px}
+.disclaimer{font-size:12px;color:#aaa;line-height:1.6;padding-top:1rem;border-top:1px solid #e8e6df;margin-top:1.5rem}
+/* Leaderboard */
+.lb-card{background:#fff;border-radius:16px;padding:1.5rem 2rem;box-shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06)}
+.lb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.lb-title{font-size:17px;font-weight:600;color:#1a1a18}
+.lb-refresh{font-size:12px;color:#888;background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;font-family:inherit;transition:background .15s}
+.lb-refresh:hover{background:#f5f5f0;color:#1a1a18}
+.lb-empty{text-align:center;padding:2rem 0;font-size:14px;color:#bbb}
+.lb-loading{text-align:center;padding:1.5rem 0;font-size:14px;color:#bbb}
+.lb-table{width:100%;border-collapse:collapse}
+.lb-table th{font-size:12px;font-weight:600;color:#888;text-align:left;padding:6px 8px;border-bottom:1.5px solid #e8e6df}
+.lb-table th:last-child,.lb-table td:last-child{text-align:right}
+.lb-table td{font-size:14px;color:#374151;padding:9px 8px;border-bottom:1px solid #f5f5f0}
+.lb-table tr:last-child td{border-bottom:none}
+.lb-table tr.lb-me td{background:#fefce8;font-weight:500}
+.lb-table tr:hover td{background:#f9f9f7}
+.lb-rank{font-weight:700;color:#888;font-size:13px;min-width:28px;display:inline-block}
+.lb-ci{font-weight:700;color:#1a1a18;font-size:15px}
+.lb-date{font-size:12px;color:#bbb}
+.setup-box{background:#fffbeb;border:1px solid #fed7aa;border-radius:10px;padding:1rem 1.25rem;font-size:13px;color:#92400e;line-height:1.7}
+.setup-box code{background:#fef3c7;padding:1px 5px;border-radius:4px;font-family:monospace;font-size:12px}
+@media(max-width:480px){body{padding:1rem .5rem}.card,.lb-card{padding:1.25rem}.iq-number{font-size:64px}h1{font-size:20px}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ══════════════════════════════════ TEST ══════════════════════════════════ -->
+<div class="card">
+
+  <!-- BIENVENIDA -->
+  <div class="screen active" id="sw">
+    <h1>Test de inteligencia cognitiva</h1>
+    <p style="margin-bottom:1.25rem">45 preguntas · 6 áreas cognitivas · incluye figuras · resultados guardados en tabla histórica</p>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-lbl">Preguntas</div><div class="stat-val">45</div></div>
+      <div class="stat-card"><div class="stat-lbl">Tiempo aprox.</div><div class="stat-val">20 min</div></div>
+      <div class="stat-card"><div class="stat-lbl">Áreas</div><div class="stat-val">6</div></div>
+      <div class="stat-card"><div class="stat-lbl">Visuales</div><div class="stat-val">10</div></div>
+    </div>
+    <div class="area-list">
+      <span class="area-chip">Razonamiento verbal</span>
+      <span class="area-chip">Series numéricas</span>
+      <span class="area-chip">Razonamiento lógico</span>
+      <span class="area-chip">Patrones y series</span>
+      <span class="area-chip">Atención y cálculo</span>
+      <span class="area-chip" style="background:#f0fdf4;color:#15803d">Razonamiento visual ✦</span>
+    </div>
+    <div class="name-wrap">
+      <label class="name-label" for="name-input">¿Cómo te llamas? (aparecerá en la tabla de resultados)</label>
+      <input class="name-input" type="text" id="name-input" placeholder="Escribe tu nombre aquí…" maxlength="30" oninput="onNameInput()">
+    </div>
+    <button class="btn" id="start-btn" onclick="startTest()" disabled>Ingresar nombre para comenzar</button>
+  </div>
+
+  <!-- PREGUNTAS -->
+  <div class="screen" id="sq">
+    <div class="prog-bar"><div class="prog-fill" id="pf" style="width:0%"></div></div>
+    <div class="meta-row"><span id="qnum">Pregunta 1 de 45</span><span id="tmr">0:00</span></div>
+    <div id="qcat-pill"></div>
+    <div class="q-text" id="qtxt"></div>
+    <div id="qsvg-box" class="qsvg-box" style="display:none"><div id="qsvg"></div></div>
+    <div id="qopts"></div>
+    <button class="btn" id="nxt" onclick="nextQ()" style="display:none">Siguiente</button>
+  </div>
+
+  <!-- CARGANDO -->
+  <div class="screen" id="sl">
+    <div class="spin-wrap"><div class="spin"></div><p class="load-msg" id="lmsg">Analizando tus respuestas…</p></div>
+  </div>
+
+  <!-- RESULTADOS -->
+  <div class="screen" id="sr"><div id="rc"></div></div>
+
+</div><!-- /card -->
+
+<!-- ══════════════════════════════ LEADERBOARD ══════════════════════════════ -->
+<div class="lb-card" id="lb-section">
+  <div class="lb-header">
+    <span class="lb-title">🏆 Tabla histórica de resultados</span>
+    <button class="lb-refresh" onclick="loadLeaderboard()">↻ Actualizar</button>
+  </div>
+  <div id="lb-content"><div class="lb-loading">Cargando resultados…</div></div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// ════════════════════════════════════════════════════════
+//  CONFIGURACIÓN FIREBASE
+//  Reemplaza esta URL con la URL de tu base de datos.
+//  Instrucciones abajo en los comentarios.
+// ════════════════════════════════════════════════════════
+var DB_URL = "https://examen-ci-default-rtdb.firebaseio.com/resultados.json";
+
+/*
+  CÓMO CONFIGURAR FIREBASE (gratis):
+  1. Ve a https://console.firebase.google.com y crea un proyecto nuevo.
+  2. En el menú izquierdo, haz clic en "Realtime Database" → "Crear base de datos".
+  3. Elige "Iniciar en modo de prueba" (permite lectura/escritura pública).
+  4. Copia la URL que aparece (ej: https://mi-proyecto-rtdb.firebaseio.com/)
+  5. Reemplaza "TU-PROYECTO-default-rtdb" en DB_URL por tu URL + "/resultados.json"
+     Ejemplo: var DB_URL = "https://mi-proyecto-rtdb.firebaseio.com/resultados.json";
+  6. Listo. Sube el archivo a GitHub Pages y comparte el enlace.
+*/
+
+var DB_OK = DB_URL.indexOf("TU-PROYECTO") === -1; // true = Firebase configurado ✓
+var userName = "";
+var lastKey = null;
+var savedCI = 0;
+
+// ════════════════════════ SVG HELPERS ════════════════════════
+var SH = '#1f2937';
+function circle(cx,cy,r,f){return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+(f?SH:'none')+'" stroke="'+SH+'" stroke-width="3"/>';}
+function rect(x,y,w,h,f){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+(f?SH:'none')+'" stroke="'+SH+'" stroke-width="3"/>';}
+function tri(cx,cy,r,f){var t=cy-r,bl=cx-r*0.866,br=cx+r*0.866,b=cy+r*0.5;return '<polygon points="'+cx+','+t+' '+br+','+b+' '+bl+','+b+'" fill="'+(f?SH:'none')+'" stroke="'+SH+'" stroke-width="3"/>';}
+function dia(cx,cy,r,f){return '<polygon points="'+cx+','+(cy-r)+' '+(cx+r)+','+cy+' '+cx+','+(cy+r)+' '+(cx-r)+','+cy+'" fill="'+(f?SH:'none')+'" stroke="'+SH+'" stroke-width="3"/>';}
+function wrap(vb,i){return '<svg viewBox="'+vb+'" xmlns="http://www.w3.org/2000/svg">'+i+'</svg>';}
+function optW(i){return '<svg viewBox="0 0 110 90" xmlns="http://www.w3.org/2000/svg">'+i+'</svg>';}
+var UP='<polygon points="55,8 37,36 47,36 47,76 63,76 63,36 73,36" fill="'+SH+'"/>';
+var RT='<polygon points="96,45 68,27 68,37 14,37 14,53 68,53 68,63" fill="'+SH+'"/>';
+var DN='<polygon points="55,82 37,54 47,54 47,14 63,14 63,54 73,54" fill="'+SH+'"/>';
+var LT='<polygon points="14,45 42,27 42,37 96,37 96,53 42,53 42,63" fill="'+SH+'"/>';
+function aSeq(a,i){return '<g transform="translate('+i*44+',0) scale(0.44)">'+a+'</g>';}
+
+// ════════════════════════ QUESTIONS ════════════════════════
+var Qs=[
+  {c:'Razonamiento verbal',q:'LIBRO es a BIBLIOTECA como CUADRO es a:',o:['Artista','Museo','Marco','Pincel'],a:1},
+  {c:'Razonamiento verbal',q:'MÉDICO es a PACIENTE como MAESTRO es a:',o:['Escuela','Alumno','Conocimiento','Pizarrón'],a:1},
+  {c:'Razonamiento verbal',q:'OSCURIDAD es lo opuesto de LUZ, así como SILENCIO es lo opuesto de:',o:['Noche','Ruido','Música','Hablar'],a:1},
+  {c:'Razonamiento verbal',q:'AGUA es a SED como COMIDA es a:',o:['Hambre','Sabor','Nutrición','Cocina'],a:0},
+  {c:'Razonamiento verbal',q:'AVIÓN es a PILOTO como BARCO es a:',o:['Marinero','Capitán','Puerto','Timón'],a:1},
+  {c:'Razonamiento verbal',q:'SEMANA es a MES como MES es a:',o:['Día','Año','Temporada','Siglo'],a:1},
+  {c:'Series numéricas',q:'¿Cuál es el siguiente número?\n2, 4, 8, 16, ___',o:['24','32','48','64'],a:1},
+  {c:'Series numéricas',q:'¿Cuál es el siguiente número?\n1, 4, 9, 16, 25, ___',o:['30','36','32','49'],a:1},
+  {c:'Series numéricas',q:'¿Cuál es el siguiente número?\n3, 6, 10, 15, 21, ___',o:['25','27','28','30'],a:2},
+  {c:'Series numéricas',q:'¿Cuál es el siguiente número?\n1, 1, 2, 3, 5, 8, 13, ___',o:['18','20','21','26'],a:2},
+  {c:'Series numéricas',q:'¿Cuál es el siguiente número?\n2, 3, 5, 7, 11, 13, ___',o:['14','15','16','17'],a:3},
+  {c:'Series numéricas',q:'¿Cuál es el siguiente número?\n100, 50, 25, 12.5, ___',o:['6','6.25','7','5'],a:1},
+  {c:'Razonamiento lógico',q:'Todos los pájaros tienen alas. Todas las águilas son pájaros. Por lo tanto:',o:['Todas las águilas tienen alas','Las águilas no necesitan alas','Todos los animales con alas son pájaros','No se puede concluir nada'],a:0},
+  {c:'Razonamiento lógico',q:'Si llueve, la calle se moja. La calle está mojada. Por lo tanto:',o:['Definitivamente llovió','No llovió','Puede haber llovido u otra cosa mojó la calle','Mañana lloverá'],a:2},
+  {c:'Razonamiento lógico',q:'Ana llegó antes que Beto. Beto llegó antes que Carlos. ¿Quién llegó de último?',o:['Ana','Beto','Carlos','No se puede saber'],a:2},
+  {c:'Razonamiento lógico',q:'5 máquinas hacen 5 artículos en 5 minutos. ¿Cuánto tardan 100 máquinas en hacer 100 artículos?',o:['100 min','10 min','5 min','1 min'],a:2},
+  {c:'Razonamiento lógico',q:'Un padre tiene 3 hijos. Cada hijo tiene UNA hermana (la misma para todos). ¿Cuántos hijos tiene el padre en total?',o:['3','4','6','7'],a:1},
+  {c:'Razonamiento lógico',q:'María tiene más dinero que Juan. Juan tiene más que Pedro. ¿Quién tiene menos?',o:['María','Juan','Pedro','No se puede saber'],a:2},
+  {c:'Patrones y series',q:'¿Cuál es la siguiente letra?\nA, C, E, G, ___',o:['H','I','J','K'],a:1},
+  {c:'Patrones y series',q:'¿Cuál es el siguiente grupo?\nAB, CD, EF, GH, ___',o:['HI','IJ','JK','IK'],a:1},
+  {c:'Patrones y series',q:'¿Cuál es el siguiente término?\n1A, 2B, 3C, 4D, ___',o:['4E','5E','5F','6E'],a:1},
+  {c:'Patrones y series',q:'Si un reloj marca exactamente las 3:00, ¿qué ángulo forman las agujas?',o:['45°','60°','90°','180°'],a:2},
+  {c:'Patrones y series',q:'¿Cuántos cuadrados hay en un tablero de 2×2 contando todos los tamaños posibles?',o:['4','5','6','8'],a:1},
+  {c:'Patrones y series',q:'Doblas un papel por la mitad dos veces y haces un agujero en el centro. ¿Cuántos agujeros hay al desdoblar?',o:['1','2','4','8'],a:2},
+  {c:'Atención y cálculo',q:'¿Cuánto es el 30% de 150?',o:['30','35','45','50'],a:2},
+  {c:'Atención y cálculo',q:'¿Cuántos meses del año tienen al menos 28 días?',o:['1','2','6','12'],a:3},
+  {c:'Atención y cálculo',q:'Un granjero tiene 17 ovejas. Todas menos 9 murieron. ¿Cuántas quedan?',o:['8','9','17','26'],a:1},
+  {c:'Atención y cálculo',q:'Si vas hacia el sur y giras a la izquierda, ¿en qué dirección caminas ahora?',o:['Norte','Sur','Este','Oeste'],a:2},
+  {c:'Atención y cálculo',q:'Si 3 × ___ = 36 ÷ 4, ¿cuál es el número que falta?',o:['3','4','6','9'],a:0},
+  {c:'Atención y cálculo',q:'¿Cuántas letras "a" hay en la palabra "banana"?',o:['1','2','3','4'],a:2},
+  // VISUAL
+  {c:'Razonamiento visual',type:'visual',q:'¿Cuál figura continúa correctamente la secuencia?',
+   svg:wrap('0 0 300 60','<circle cx="17" cy="30" r="11" fill="'+SH+'"/><circle cx="50" cy="30" r="11" fill="'+SH+'"/><rect x="72" y="19" width="22" height="22" fill="'+SH+'"/><circle cx="117" cy="30" r="11" fill="'+SH+'"/><circle cx="150" cy="30" r="11" fill="'+SH+'"/><rect x="172" y="19" width="22" height="22" fill="'+SH+'"/><circle cx="217" cy="30" r="11" fill="'+SH+'"/><circle cx="250" cy="30" r="11" fill="'+SH+'"/><rect x="272" y="19" width="22" height="22" fill="none" stroke="#9ca3af" stroke-width="2" stroke-dasharray="4,3" rx="2"/><text x="283" y="34" font-size="13" fill="#9ca3af" font-family="sans-serif" text-anchor="middle">?</text>'),
+   o:[optW(circle(55,45,25,true)),optW(rect(20,15,70,58,true)),optW(tri(55,45,30,true)),optW(dia(55,45,28,true))],oSvg:true,a:1},
+  {c:'Razonamiento visual',type:'visual',q:'¿Cuál figura NO pertenece al grupo? (las demás comparten una característica)',
+   svg:wrap('0 0 280 105','<circle cx="35" cy="46" r="22" fill="'+SH+'"/><circle cx="95" cy="46" r="15" fill="'+SH+'"/><ellipse cx="157" cy="46" rx="27" ry="17" fill="'+SH+'"/><rect x="196" y="27" width="44" height="38" fill="'+SH+'"/><text x="35" y="90" font-size="13" fill="#6b7280" font-family="sans-serif" text-anchor="middle">A</text><text x="95" y="90" font-size="13" fill="#6b7280" font-family="sans-serif" text-anchor="middle">B</text><text x="157" y="90" font-size="13" fill="#6b7280" font-family="sans-serif" text-anchor="middle">C</text><text x="218" y="90" font-size="13" fill="#6b7280" font-family="sans-serif" text-anchor="middle">D</text>'),
+   o:['A','B','C','D'],oSvg:false,a:3},
+  {c:'Razonamiento visual',type:'visual',q:'¿Qué figura completa correctamente la matriz? (observa el patrón de filas y columnas)',
+   svg:wrap('0 0 210 175','<rect x="5" y="5" width="93" height="78" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.5"/><rect x="112" y="5" width="93" height="78" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.5"/><rect x="5" y="97" width="93" height="73" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.5"/><rect x="112" y="97" width="93" height="73" fill="#f9fafb" stroke="#d1d5db" stroke-dasharray="5,4" stroke-width="1.5"/>'+circle(51,44,24,true)+circle(158,44,24,false)+'<rect x="22" y="112" width="58" height="45" fill="'+SH+'"/><text x="158" y="140" font-size="26" fill="#9ca3af" font-family="sans-serif" text-anchor="middle" dominant-baseline="middle">?</text>'),
+   o:[optW(circle(55,45,27,true)),optW(circle(55,45,27,false)),optW(rect(22,18,66,54,true)),optW(rect(22,18,66,54,false))],oSvg:true,a:3},
+  {c:'Razonamiento visual',type:'visual',q:'¿Cuántos cuadrados hay en total en esta figura, contando TODOS los tamaños posibles?',
+   svg:wrap('0 0 160 160','<rect x="10" y="10" width="140" height="140" fill="none" stroke="'+SH+'" stroke-width="3"/><line x1="10" y1="80" x2="150" y2="80" stroke="'+SH+'" stroke-width="3"/><line x1="80" y1="10" x2="80" y2="150" stroke="'+SH+'" stroke-width="3"/>'),
+   o:['3','4','5','6'],oSvg:false,a:2},
+  {c:'Razonamiento visual',type:'visual',q:'La figura de arriba es una flecha apuntando a la DERECHA.\n¿Cuál opción muestra la misma flecha rotada 90° en sentido horario?',
+   svg:wrap('0 0 110 90',RT),o:[optW(UP),optW(RT),optW(DN),optW(LT)],oSvg:true,a:2},
+  {c:'Razonamiento visual',type:'visual',q:'Observa el patrón de la matriz. ¿Qué figura pertenece en la casilla con "?"',
+   svg:wrap('0 0 280 225','<rect x="5" y="5" width="82" height="66" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.5"/><rect x="99" y="5" width="82" height="66" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.5"/><rect x="193" y="5" width="82" height="66" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.5"/><rect x="5" y="80" width="82" height="66" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.5"/><rect x="99" y="80" width="82" height="66" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.5"/><rect x="193" y="80" width="82" height="66" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.5"/><rect x="5" y="155" width="82" height="65" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.5"/><rect x="99" y="155" width="82" height="65" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.5"/><rect x="193" y="155" width="82" height="65" fill="#f9fafb" stroke="#d1d5db" stroke-dasharray="5,4" stroke-width="1.5"/>'+tri(46,38,20,true)+tri(125,38,16,true)+tri(157,38,16,true)+tri(210,38,13,true)+tri(228,38,13,true)+tri(246,38,13,true)+circle(46,113,20,true)+circle(124,113,14,true)+circle(148,113,14,true)+circle(207,113,11,true)+circle(223,113,11,true)+circle(239,113,11,true)+'<rect x="26" y="166" width="40" height="34" fill="'+SH+'"/><rect x="103" y="166" width="30" height="26" fill="'+SH+'"/><rect x="141" y="166" width="30" height="26" fill="'+SH+'"/><text x="234" y="191" font-size="22" fill="#9ca3af" font-family="sans-serif" text-anchor="middle" dominant-baseline="middle">?</text>'),
+   o:[optW(rect(35,28,40,34,true)),optW('<rect x="15" y="28" width="34" height="34" fill="'+SH+'"/><rect x="61" y="28" width="34" height="34" fill="'+SH+'"/>'),optW('<rect x="5" y="30" width="28" height="28" fill="'+SH+'"/><rect x="41" y="30" width="28" height="28" fill="'+SH+'"/><rect x="77" y="30" width="28" height="28" fill="'+SH+'"/>'),optW(circle(55,45,25,true))],oSvg:true,a:2},
+  {c:'Razonamiento visual',type:'visual',q:'¿Cuántos triángulos hay en total en esta figura? Cuenta los grandes y los pequeños.',
+   svg:wrap('0 0 200 180','<polygon points="100,12 10,168 190,168" fill="none" stroke="'+SH+'" stroke-width="3"/><line x1="55" y1="90" x2="145" y2="90" stroke="'+SH+'" stroke-width="2"/><line x1="55" y1="90" x2="100" y2="168" stroke="'+SH+'" stroke-width="2"/><line x1="145" y1="90" x2="100" y2="168" stroke="'+SH+'" stroke-width="2"/>'),
+   o:['3','4','5','6'],oSvg:false,a:2},
+  {c:'Razonamiento visual',type:'visual',q:'Las flechas de arriba siguen un patrón de rotación.\n¿Qué flecha continúa la secuencia?',
+   svg:wrap('0 0 340 66',aSeq(UP,0)+aSeq(RT,1)+aSeq(DN,2)+aSeq(LT,3)+aSeq(UP,4)+aSeq(RT,5)+aSeq(DN,6)+'<rect x="314" y="12" width="22" height="42" fill="none" stroke="#9ca3af" stroke-dasharray="4,3" stroke-width="2" rx="3"/><text x="325" y="37" font-size="13" fill="#9ca3af" font-family="sans-serif" text-anchor="middle">?</text>'),
+   o:[optW(UP),optW(RT),optW(DN),optW(LT)],oSvg:true,a:3},
+  {c:'Razonamiento visual',type:'visual',q:'Observa la secuencia: tres círculos (grande→mediano→pequeño) seguidos de cuadrados. ¿Cuál figura sigue?',
+   svg:wrap('0 0 330 70','<circle cx="25" cy="35" r="23" fill="'+SH+'"/><circle cx="78" cy="35" r="16" fill="'+SH+'"/><circle cx="120" cy="35" r="10" fill="'+SH+'"/><rect x="140" y="10" width="42" height="50" fill="'+SH+'"/><rect x="198" y="18" width="30" height="34" fill="'+SH+'"/><rect x="246" y="25" width="22" height="22" fill="none" stroke="#9ca3af" stroke-width="2" stroke-dasharray="4,3" rx="2"/><text x="257" y="39" font-size="13" fill="#9ca3af" font-family="sans-serif" text-anchor="middle">?</text>'),
+   o:[optW(circle(55,45,20,true)),optW(rect(18,10,74,68,true)),optW(rect(30,20,50,48,true)),optW(rect(36,30,38,28,true))],oSvg:true,a:3},
+  {c:'Razonamiento visual',type:'visual',q:'¿Cuál opción es el reflejo HORIZONTAL (espejo) de la figura de arriba?',
+   svg:wrap('0 0 120 120','<rect x="18" y="15" width="18" height="90" fill="'+SH+'"/><rect x="18" y="15" width="72" height="18" fill="'+SH+'"/><rect x="18" y="57" width="46" height="18" fill="'+SH+'"/>'),
+   o:[optW('<rect x="74" y="15" width="18" height="90" fill="'+SH+'"/><rect x="20" y="15" width="72" height="18" fill="'+SH+'"/><rect x="46" y="57" width="46" height="18" fill="'+SH+'"/>'),optW('<rect x="18" y="15" width="18" height="90" fill="'+SH+'"/><rect x="18" y="15" width="72" height="18" fill="'+SH+'"/><rect x="18" y="57" width="46" height="18" fill="'+SH+'"/>'),optW('<rect x="18" y="15" width="18" height="90" fill="'+SH+'"/><rect x="18" y="87" width="72" height="18" fill="'+SH+'"/><rect x="18" y="45" width="46" height="18" fill="'+SH+'"/>'),optW('<rect x="74" y="15" width="18" height="90" fill="'+SH+'"/><rect x="20" y="87" width="72" height="18" fill="'+SH+'"/><rect x="46" y="45" width="46" height="18" fill="'+SH+'"/>')],oSvg:true,a:0},
+  // EXTRA TEXTO
+  {c:'Series numéricas',q:'Si el doble de un número es 36, ¿cuánto es la mitad de ese número?',o:['6','8','9','12'],a:2},
+  {c:'Razonamiento verbal',q:'RÁPIDO es a VELOZ como TRISTE es a:',o:['Lloroso','Melancólico','Enojado','Cansado'],a:1},
+  {c:'Atención y cálculo',q:'Las iniciales de los meses del año son:\nE F M A M J J A ___ O N D\n¿Cuál es la inicial que falta?',o:['S','B','P','T'],a:0}
+];
+
+var catCols={'Razonamiento verbal':'#185FA5','Series numéricas':'#0F6E56','Razonamiento lógico':'#534AB7','Patrones y series':'#B45309','Atención y cálculo':'#854F0B','Razonamiento visual':'#15803d'};
+var cur=0, ans=[], elapsed=0, ticker;
+
+// ════════════════════════ NAME INPUT ════════════════════════
+function onNameInput(){
+  var v=document.getElementById('name-input').value.trim();
+  var btn=document.getElementById('start-btn');
+  if(v.length>=2){btn.disabled=false;btn.textContent='Comenzar prueba';}
+  else{btn.disabled=true;btn.textContent='Ingresar nombre para comenzar';}
+}
+
+// ════════════════════════ SCREENS ════════════════════════
+function show(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById(id).classList.add('active');}
+
+function startTest(){
+  userName=document.getElementById('name-input').value.trim();
+  if(userName.length<2) return;
+  ticker=setInterval(function(){elapsed++;var m=Math.floor(elapsed/60),s=elapsed%60;document.getElementById('tmr').textContent=m+':'+(s<10?'0':'')+s;},1000);
+  show('sq'); renderQ();
+}
+
+// ════════════════════════ RENDER QUESTION ════════════════════════
+function renderQ(){
+  var q=Qs[cur],tot=Qs.length;
+  document.getElementById('pf').style.width=Math.round((cur/tot)*100)+'%';
+  document.getElementById('qnum').textContent='Pregunta '+(cur+1)+' de '+tot;
+  var isVis=q.type==='visual';
+  document.getElementById('qcat-pill').innerHTML='<span class="cat-pill '+(isVis?'cat-vis':'cat-text')+'">'+q.c+(isVis?' ✦':'')+'</span>';
+  document.getElementById('qtxt').textContent=q.q;
+  var nxt=document.getElementById('nxt');nxt.style.display='none';nxt.textContent=cur===tot-1?'Ver mis resultados →':'Siguiente →';
+  var svgBox=document.getElementById('qsvg-box');
+  if(q.svg){svgBox.style.display='block';document.getElementById('qsvg').innerHTML=q.svg;}else svgBox.style.display='none';
+  var d=document.getElementById('qopts');d.innerHTML='';
+  if(isVis&&q.oSvg){
+    var grid=document.createElement('div');grid.className='opt-grid';
+    ['A','B','C','D'].forEach(function(lbl,i){
+      var btn=document.createElement('button');btn.className='opt-card';
+      btn.innerHTML=q.o[i]+'<span class="opt-label">'+lbl+'</span>';
+      btn.onclick=(function(idx){return function(){pickCard(idx);};})(i);
+      grid.appendChild(btn);
+    });d.appendChild(grid);
+  } else {
+    q.o.forEach(function(op,i){
+      var b=document.createElement('button');b.className='opt';b.textContent=op;
+      b.onclick=(function(idx){return function(){pick(idx);};})(i);
+      d.appendChild(b);
+    });
+  }
+}
+
+function pick(i){
+  var q=Qs[cur];var btns=document.querySelectorAll('.opt');
+  btns.forEach(function(b){b.disabled=true;});
+  ans.push({cat:q.c,ok:i===q.a});
+  btns[i].classList.add(i===q.a?'ok':'bad');
+  if(i!==q.a)btns[q.a].classList.add('ok');
+  document.getElementById('nxt').style.display='block';
+}
+
+function pickCard(i){
+  var q=Qs[cur];var cards=document.querySelectorAll('.opt-card');
+  cards.forEach(function(c){c.disabled=true;});
+  ans.push({cat:q.c,ok:i===q.a});
+  cards[i].classList.add(i===q.a?'ok':'bad');
+  if(i!==q.a)cards[q.a].classList.add('ok');
+  document.getElementById('nxt').style.display='block';
+}
+
+function nextQ(){cur++;cur>=Qs.length?finish():renderQ();}
+
+function finish(){
+  clearInterval(ticker);show('sl');
+  var msgs=['Analizando tus respuestas…','Calculando perfil cognitivo…','Guardando en la tabla histórica…','Generando análisis personalizado…'];
+  var mi=0;var iv=setInterval(function(){mi=(mi+1)%msgs.length;document.getElementById('lmsg').textContent=msgs[mi];},2200);
+  callAPI(iv);
+}
+
+function getCats(){
+  var r={};ans.forEach(function(a){if(!r[a.cat])r[a.cat]={ok:0,n:0};r[a.cat].n++;if(a.ok)r[a.cat].ok++;});return r;
+}
+
+// ════════════════════════ FIREBASE ════════════════════════
+async function saveScore(iq, nivel){
+  if(!DB_OK) return null;
+  var entry={name:userName,ci:iq,nivel:nivel||'',ts:Date.now(),date:new Date().toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'})};
+  try{
+    var res=await fetch(DB_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry)});
+    var data=await res.json();return data.name||null;
+  }catch(e){return null;}
+}
+
+async function loadLeaderboard(){
+  var el=document.getElementById('lb-content');
+  el.innerHTML='<div class="lb-loading">Cargando…</div>';
+  if(!DB_OK){
+    el.innerHTML='<div class="setup-box">'+
+      '<strong>Configura Firebase para habilitar la tabla histórica.</strong><br>'+
+      'Edita este archivo HTML y reemplaza <code>TU-PROYECTO-default-rtdb</code> en la variable <code>DB_URL</code> con la URL de tu base de datos Firebase.<br><br>'+
+      'Instrucciones: ve a <strong>console.firebase.google.com</strong> → nuevo proyecto → Realtime Database → Crear base de datos → copia la URL.'+
+      '</div>';return;
+  }
+  try{
+    var res=await fetch(DB_URL);
+    var data=await res.json();
+    if(!data){el.innerHTML='<div class="lb-empty">Aún no hay resultados. ¡Sé el primero!</div>';return;}
+    var entries=Object.entries(data).map(function(e){return Object.assign({key:e[0]},e[1]);});
+    entries.sort(function(a,b){return b.ci-a.ci;});
+    renderLBTable(entries);
+  }catch(e){el.innerHTML='<div class="lb-empty">No se pudo cargar la tabla.</div>';}
+}
+
+function renderLBTable(entries){
+  if(!entries||!entries.length){document.getElementById('lb-content').innerHTML='<div class="lb-empty">Aún no hay resultados. ¡Sé el primero!</div>';return;}
+  var medals=['🥇','🥈','🥉'];
+  var rows=entries.slice(0,50).map(function(e,i){
+    var isMe=e.key===lastKey;
+    var rank=i<3?medals[i]:'<span class="lb-rank">'+(i+1)+'</span>';
+    return '<tr class="'+(isMe?'lb-me':'')+'" title="'+(isMe?'Tu resultado':'')+'">'+
+      '<td style="text-align:center">'+rank+'</td>'+
+      '<td style="font-weight:'+(isMe?'600':'400')+'">'+escHtml(e.name)+(isMe?' ← tú':'')+' </td>'+
+      '<td style="text-align:center"><span class="lb-ci">'+e.ci+'</span></td>'+
+      '<td style="font-size:12px;color:#6b7280">'+escHtml(e.nivel||'')+'</td>'+
+      '<td class="lb-date">'+escHtml(e.date||'')+'</td>'+
+      '</tr>';
+  }).join('');
+  document.getElementById('lb-content').innerHTML=
+    '<table class="lb-table">'+
+    '<thead><tr><th style="text-align:center">#</th><th>Nombre</th><th style="text-align:center">CI</th><th>Nivel</th><th>Fecha</th></tr></thead>'+
+    '<tbody>'+rows+'</tbody></table>'+
+    (entries.length>50?'<p style="font-size:12px;color:#bbb;text-align:center;margin-top:.75rem">Mostrando los primeros 50 resultados</p>':'');
+}
+
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ════════════════════════ CLAUDE API ════════════════════════
+async function callAPI(iv){
+  var cats=getCats(),total=ans.filter(function(a){return a.ok;}).length;
+  var m=Math.floor(elapsed/60),s=elapsed%60;
+  var summary=Object.entries(cats).map(function(e){return e[0]+': '+e[1].ok+'/'+e[1].n;}).join('\n');
+  var prompt='Eres psicólogo especialista en evaluación cognitiva. Analiza este test de CI de 45 preguntas.\n\nRESULTADOS:\n'+summary+'\nTotal: '+total+'/45\nTiempo: '+m+' min '+s+' seg\n\nResponde SOLO con JSON válido sin backticks:\n{"iq":<70-145>,"nivel":"<Extremadamente alto/Muy superior/Superior/Por encima de la media/Media/Por debajo de la media>","desc_iq":"<2-3 oraciones>","fortalezas":["<f1>","<f2>","<f3>"],"mejoras":["<m1>","<m2>"],"perfil":"<3-4 oraciones cognitivas>","carreras":["<c1>","<c2>","<c3>","<c4>","<c5>","<c6>"],"personalidad":"<3-4 oraciones>","consejo":"<2-3 oraciones motivadoras>","curiosidad":"<dato fascinante>"}';
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    clearInterval(iv);
+    var data=await res.json();
+    var raw=data.content.map(function(b){return b.text||'';}).join('');
+    var result;
+    try{result=JSON.parse(raw.replace(/```json|```/g,'').trim());}
+    catch(e){var match=raw.match(/\{[\s\S]*\}/);result=match?JSON.parse(match[0]):null;}
+    if(result){
+      savedCI=result.iq;
+      lastKey=await saveScore(result.iq, result.nivel);
+      renderResults(result,cats,total);
+      loadLeaderboard();
+    } else renderBasic(total);
+  }catch(e){clearInterval(iv);renderBasic(total);}
+}
+
+// ════════════════════════ RENDER RESULTS ════════════════════════
+function iqColor(iq){return iq>=130?'#0F6E56':iq>=120?'#1a6bcc':iq>=110?'#534AB7':iq>=90?'#374151':'#B91C1C';}
+function chk(){return '<svg style="width:16px;height:16px;flex-shrink:0;margin-top:1px" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#dcfce7"/><path d="M5 8l2 2 4-4" stroke="#15803d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';}
+function arw(){return '<svg style="width:16px;height:16px;flex-shrink:0;margin-top:1px" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#fef3c7"/><path d="M8 11V5M5.5 7.5L8 5l2.5 2.5" stroke="#d97706" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';}
+
+function renderResults(r,cats,total){
+  show('sr');
+  var ic=iqColor(r.iq);var m=Math.floor(elapsed/60),s=elapsed%60;
+  var bars=Object.entries(cats).map(function(e){var c=e[0],v=e[1];var pct=Math.round((v.ok/v.n)*100);var col=catCols[c]||'#1a6bcc';return '<div class="bar-wrap"><div class="bar-meta"><span>'+c+'</span><span style="font-weight:500">'+v.ok+'/'+v.n+'</span></div><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div></div>';}).join('');
+  var ftags=(r.carreras||[]).map(function(c){return '<span class="tag">'+c+'</span>';}).join('');
+  var frows=(r.fortalezas||[]).map(function(f){return '<div class="item-row">'+chk()+'<span>'+f+'</span></div>';}).join('');
+  var mrows=(r.mejoras||[]).map(function(f){return '<div class="item-row">'+arw()+'<span>'+f+'</span></div>';}).join('');
+  var savedMsg=DB_OK&&lastKey?'<div class="hi-green"><div class="hit">✓ Resultado guardado en la tabla histórica</div><p>Tu nombre y CI '+r.iq+' aparecen en la tabla de abajo. ¡Todos los participantes pueden verlo!</p></div>':'';
+  document.getElementById('rc').innerHTML=
+    '<div class="iq-hero">'+
+    '<div style="font-size:15px;color:#888;margin-bottom:4px">'+escHtml(userName)+'</div>'+
+    '<div class="iq-number" style="color:'+ic+'">'+r.iq+'</div>'+
+    '<div class="iq-label">CI estimado</div>'+
+    '<div class="iq-badge">'+(r.nivel||'')+'</div></div>'+
+    '<div class="stat-grid"><div class="stat-card"><div class="stat-lbl">Correctas</div><div class="stat-val">'+total+'/45</div></div><div class="stat-card"><div class="stat-lbl">Tiempo</div><div class="stat-val">'+m+':'+(s<10?'0':'')+s+'</div></div></div>'+
+    savedMsg+
+    '<h2>¿Qué significa tu CI?</h2><p>'+(r.desc_iq||'')+'</p>'+
+    '<h2>Rendimiento por área</h2>'+bars+
+    '<h2>Perfil cognitivo</h2><p>'+(r.perfil||'')+'</p>'+
+    '<h2>Fortalezas</h2>'+frows+
+    '<h2>Áreas de mejora</h2>'+mrows+
+    '<h2>Carreras recomendadas</h2><div class="tag-row" style="margin-top:.5rem">'+ftags+'</div>'+
+    '<h2>Análisis de personalidad</h2><p>'+(r.personalidad||'')+'</p>'+
+    '<div class="hi-blue"><div class="hit">Consejo personalizado</div><p>'+(r.consejo||'')+'</p></div>'+
+    (r.curiosidad?'<div class="hi-gray"><div class="hit">Curiosidad sobre tu mente</div><p>'+r.curiosidad+'</p></div>':'')+
+    '<p class="disclaimer">Estimación orientativa. Para evaluación clínica oficial consulta a un psicólogo certificado (WAIS-IV o Stanford-Binet).</p>'+
+    '<button class="btn btn-outline" onclick="restart()">Realizar el test de nuevo</button>';
+}
+
+function renderBasic(total){
+  show('sr');var iq=Math.round(70+(total/45)*75);var ic=iqColor(iq);var m=Math.floor(elapsed/60),s=elapsed%60;
+  document.getElementById('rc').innerHTML=
+    '<div class="iq-hero"><div style="font-size:15px;color:#888;margin-bottom:4px">'+escHtml(userName)+'</div><div class="iq-number" style="color:'+ic+'">'+iq+'</div><div class="iq-label">CI estimado · '+total+'/45 correctas</div></div>'+
+    '<p style="text-align:center;color:#aaa;font-size:13px;margin-top:1rem">No se pudo conectar al análisis IA.</p>'+
+    '<p class="disclaimer">Estimación orientativa. Para evaluación clínica consulta a un psicólogo certificado.</p>'+
+    '<button class="btn btn-outline" onclick="restart()">Realizar el test de nuevo</button>';
+}
+
+function restart(){
+  cur=0;ans=[];elapsed=0;lastKey=null;clearInterval(ticker);
+  document.getElementById('pf').style.width='0%';
+  document.getElementById('tmr').textContent='0:00';
+  document.getElementById('name-input').value='';
+  document.getElementById('start-btn').disabled=true;
+  document.getElementById('start-btn').textContent='Ingresar nombre para comenzar';
+  show('sw');
+}
+
+// ════════════════════════ INIT ════════════════════════
+loadLeaderboard();
+</script>
+</body>
+</html>
